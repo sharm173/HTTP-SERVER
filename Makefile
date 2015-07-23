@@ -17,7 +17,7 @@ http-server : http-server.o
 	$(CXX) -o $@ -c -I. $<
 
 git: 
-	git add Makefile *.cc *.h  *.c 2>&1 >> .local.git.out || echo	
+	git add Makefile *.c *.cpp *.cc *.h  *.c 2>&1 >> .local.git.out || echo	
 	git commit -a -m "Commit HTTP Server" 2>&1  >> .local.git.out || echo
 
 clean:
