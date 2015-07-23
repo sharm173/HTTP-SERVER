@@ -17,8 +17,8 @@ http-server : http-server.o
 	$(CXX) -o $@ -c -I. $<
 
 git: 
-	git add Makefile *.cc *.h  *.c >> .local.git.out	
-	git commit -a -m "Commit HTTP Server" >> .local.git.out
+	git add Makefile *.cc *.h  *.c 2>&1 >> .local.git.out || echo	
+	git commit -a -m "Commit HTTP Server" 2>&1  >> .local.git.out || echo
 
 clean:
 	rm -f *.o use-dlopen hello.so
