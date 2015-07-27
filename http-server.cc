@@ -85,15 +85,19 @@ else {
     exit( -1 );
   }
    
-if(argc == 3 && argv[1][1] == 'p') {
+if(argc == 3 ) {
+if(argv[1][1] == 'f') forkServer(masterSocket);
+else if (argv[1][1] == 't') createThreadForEachRequest(masterSocket);
+else if (argv[1][1] == 'p') poolOfThreads(masterSocket);
 
+else {
+}
 
 }
 
 else {
-
-
-
+//run iterative server
+iterativeServer(masterSocket);
 }
 
 
