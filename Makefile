@@ -10,7 +10,7 @@ daytime-server : daytime-server.o
 	$(CXX) -o $@ $@.o $(NETLIBS)
 
 http-server : http-server.o
-	$(CXX) -o $@ $@.o $(NETLIBS)
+	$(CXX) -pthread -o $@ $@.o $(NETLIBS)
 
 %.o: %.cc
 	@echo 'Building $@ from $<'

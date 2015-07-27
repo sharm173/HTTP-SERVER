@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
+#include <pthread.h>
 
 const char * usage =
 "								\n"
@@ -27,11 +28,12 @@ const char * usage =
 int QueueLength = 5;  
 
 // Processes time request
-void processProcess( int socket );
-
-void processThread( int socket );
-
-void processPool( int socket );
+void dispatchHTTP( int slaveSocket );
+void iterativeServer (int masterSocket);
+void forkServer (int masterSocket);
+void createThreadForEachRequest (int masterSocket);
+void poolOfThreads (int masterSocket);
+void *loopthread (int masterSocket);
 
 int
 main(int argc, char **argv)
@@ -100,3 +102,85 @@ else {
 
 }
 
+void iterativeServer( int masterSocket) {
+
+	while (1) {
+		 struct sockaddr_in clientIPAddress;
+		int alen = sizeof( clientIPAddress );
+		int slaveSocket =accept(masterSocket,(struct sockaddr*)&clientIPAddress, (socklen_t*)&alen);
+		
+		if (slaveSocket >= 0) {
+			dispatchHTTP(slaveSocket);
+		}
+
+	//dispatch http closes slave socket
+
+	}
+
+}
+
+
+void forkServer( int masterSocket) {
+	while (1) {
+                 struct sockaddr_in clientIPAddress;
+                int alen = sizeof( clientIPAddress );
+                int slaveSocket =accept(masterSocket,(struct sockaddr*)&clientIPAddress, (socklen_t*)&alen);
+		
+		if (slaveSocket >= 0) {
+			int ret = fork();
+			if (ret == 0) {
+				dispatchHTTP(slaveSocket);
+				exit(0);
+			}
+			close(slaveSocket);
+		}
+
+	}
+}
+
+void createThreadForEachRequest(int masterSocket)
+{
+	while (1) {
+                 struct sockaddr_in clientIPAddress;
+                int alen = sizeof( clientIPAddress );
+                int slaveSocket =accept(masterSocket,(struct sockaddr*)&clientIPAddress, (socklen_t*)&alen);
+
+		if (slaveSocket >= 0) {
+			// When the thread ends resources are recycled
+			pthread_t thread;
+			pthread_attr_t attr;
+			pthread_attr_init(&attr);
+			pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
+			pthread_create(&thread, &attr, (void * (*)(void *))dispatchHTTP, (void *) slaveSocket);
+
+		}
+	}
+}
+
+
+void poolOfThreads( int masterSocket ) {
+	pthread_t thread[5];
+	for (int i=0; i<4; i++) {
+		pthread_create(&thread[i], NULL, (void * (*)(void *))loopthread,(void *)masterSocket);
+	}
+
+	loopthread (masterSocket);
+}
+
+
+void *loopthread (int masterSocket) {
+
+	while (1) {
+                 struct sockaddr_in clientIPAddress;
+                int alen = sizeof( clientIPAddress );
+                int slaveSocket =accept(masterSocket,(struct sockaddr*)&clientIPAddress, (socklen_t*)&alen);
+		if (slaveSocket >= 0) {
+			dispatchHTTP(slaveSocket);
+		}
+	}
+}
+
+void dispatchHTTP( int slaveSocket ) {
+
+
+}
