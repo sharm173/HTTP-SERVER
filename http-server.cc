@@ -253,6 +253,14 @@ char docPath[1025] = {0};
 	}
 
 	if(strstr(docPath,"..") != 0) {
+	char expand[1025] = {0};
+	char *real = realpath(docPath, expand);
+	
+	if(real != NULL && strlen(expand) >= strlen(cwd) + strlen("/http-root-dir")) {
+	
+	
+	}
+	
 	}
 
 
