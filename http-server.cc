@@ -224,29 +224,35 @@ char docPath[1025] = {0};
 	getcwd(cwd,sizeof(cwd)); 
 
 	if (strncmp(docPath, "/icons", strlen("/icons")) == 0) {
-	
-	
+		strcat(cwd, "/http-root-dir/");	
+		strcat(cwd, docPath);
 	}
 	
 	else if (strncmp(docPath, "/htdocs", strlen("/htdocs")) == 0) {
-	
+		strcat(cwd, "/http-root-dir/");
+		strcat(cwd, docPath);
 	}
 
 	else if (strncmp(docPath, "/cgi-bin", strlen("/cgi-bin")) == 0) {
-	
+		strcat(cwd, "/http-root-dir/");
+		strcat(cwd, docPath);
 	}
 	
 	else {
 	
 		if(strcmp(docPath,"/") == 0) {
-		
+			strcat(cwd, "/http-root-dir/htdocs/index.html");
 		}
 		
 		else {
-		
+			strcat(cwd, "/http-root-dir/htdocs");
+			strcat(cwd, docPath);
 		}
 		
 	
+	}
+
+	if(strstr(docPath,"..") != 0) {
 	}
 
 
