@@ -281,7 +281,7 @@ char docPath[1025] = {0};
 
 
 	FILE *doc;
-	printf(cwd);	
+	printf("%s",cwd);	
 	if (strstr(contentType, "image/gif") != 0 || strstr(contentType, "image/jpeg") != 0)
        		doc = fopen(cwd, "rb");
     	else
@@ -308,7 +308,7 @@ char docPath[1025] = {0};
 		while(count = read(fd,&c,sizeof(c))){
 	
 			if(write(socket,&c,sizeof(c)) != count){
-			 	perror("write");
+			// 	perror("write");
 			}
 
 		}
