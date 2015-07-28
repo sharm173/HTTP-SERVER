@@ -256,7 +256,7 @@ void dispatchHTTP( int socket ) {
 		char expand[1025] = {0};
 		char *real = realpath(docPath, expand);
 	
-		if(real != NULL && strlen(expand) >= strlen(cwd) + strlen("/http-root-dir")) {
+		if(real != NULL && strlen(expand) >= strlen(cwd) + strlen("/http-root-dir/htdocs")) {
 			strcpy(cwd,expand);	
 	
 		}
