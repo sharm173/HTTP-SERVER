@@ -308,7 +308,7 @@ char docPath[1025] = {0};
 		while(count = read(fd,&c,sizeof(c))){
 	
 			if(write(socket,&c,sizeof(c)) != count){
-			 	perror("write");
+//			 	perror("write");
 			}
 
 		}
