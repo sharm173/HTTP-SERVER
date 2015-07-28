@@ -197,7 +197,7 @@ void dispatchHTTP( int socket ) {
 
 
 	while(n = read(socket, &newChar, sizeof(newChar))){
-		length++;
+		//length++;
 		if(newChar == ' '){
 			
 			if(gotGET==0)
