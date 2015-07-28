@@ -187,13 +187,13 @@ void *loopthread (int masterSocket) {
 
 void dispatchHTTP( int socket ) {
 
-char curr_string[1025];
-int n;
-unsigned char newChar;
-unsigned char oldChar = 0;
-int gotGET = 0;
-int length = 0;
-char docPath[1025] = {0};
+	char curr_string[1025];
+	int n;
+	unsigned char newChar;
+	unsigned char oldChar = 0;
+	int gotGET = 0;
+	int length = 0;
+	char docPath[1025] = {0};
 
 
 	while(n = read(socket, &newChar, sizeof(newChar))){
@@ -213,7 +213,7 @@ char docPath[1025] = {0};
 	
 		else{
 			oldChar = newChar;
-			if(gotGET==0){
+			if(gotGET==1){
 				curr_string[length] = newChar;
 				length++;
 			}
