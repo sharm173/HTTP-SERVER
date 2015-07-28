@@ -238,6 +238,14 @@ char docPath[1025] = {0};
 	
 	else {
 	
+		if(strcmp(docPath,"/") == 0) {
+		
+		}
+		
+		else {
+		
+		}
+		
 	
 	}
 
