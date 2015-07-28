@@ -278,5 +278,48 @@ char docPath[1025] = {0};
 	else {
 	strcpy(contentType, "text/plain");
 	}
+
+
+	FILE *doc;
+	
+	if (strstr(contentType, "image/gif") != 0 || strstr(contentType, "image/jpeg") != 0)
+       		doc = fopen(cwd, "rb");
+    	else
+        	doc = fopen(cwd, "r");
+
+	
+	if(doc > 0) {
+	
+		write(socket, "HTTP/1.1 200 Document follows\r\n", 31);
+	
+		write(socket, "Server: CS252 Lab4\r\n", 20);
+	
+		write(socket, "Content-type: ",14);
+	
+		write(socket,contentType, strlen(contentType));
+
+		write(socket, "\r\n\r\n",4);	
+	
+		long count = 0;
+		
+		char c;
+		int fd = fileno(doc);
+
+		while(count = read(fd,&c,sizeof(c))){
+	
+			if(write(socket,&c,sizeof(c)) != count){
+			 	perror("write");
+			}
+
+		}
+		
+		fclose(doc); 
+	}
+
+	else {
+	//404 error
+	
+	
+	}
 	
 }
