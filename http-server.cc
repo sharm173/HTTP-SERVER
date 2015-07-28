@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -26,6 +27,7 @@ const char * usage =
 "-p:  Pool of threads						\n";
 
 int QueueLength = 5;  
+pthread_mutex_t mutex;
 
 // Processes time request
 void dispatchHTTP( int socket );
@@ -112,12 +114,18 @@ void iterativeServer( int masterSocket) {
 	while (1) {
 		 struct sockaddr_in clientIPAddress;
 		int alen = sizeof( clientIPAddress );
+		printf("before slaveSocket\n");
 		int slaveSocket =accept(masterSocket,(struct sockaddr*)&clientIPAddress, (socklen_t*)&alen);
-	//		if(slaveSocket == -1) continue;		
+		printf("after slaveSocket\n");
+		if(slaveSocket < 0) {
+		printf("%s",strerror(errno));
+		}
+		
 		if (slaveSocket >= 0) {
 			dispatchHTTP(slaveSocket);
 		}
-//	close(slaveSocket);
+	//close(slaveSocket);
+	//shutdown(slaveSocket,0);
 	//dispatch http closes slave socket
 
 	}
@@ -164,6 +172,7 @@ void createThreadForEachRequest(int masterSocket)
 
 
 void poolOfThreads( int masterSocket ) {
+	pthread_mutex_init(&mutex, NULL);
 	pthread_t thread[5];
 	for (int i=0; i<4; i++) {
 		pthread_create(&thread[i], NULL, (void * (*)(void *))loopthread,(void *)masterSocket);
@@ -178,7 +187,10 @@ void *loopthread (int masterSocket) {
 	while (1) {
                  struct sockaddr_in clientIPAddress;
                 int alen = sizeof( clientIPAddress );
+		pthread_mutex_lock(&mutex);
                 int slaveSocket =accept(masterSocket,(struct sockaddr*)&clientIPAddress, (socklen_t*)&alen);
+		pthread_mutex_unlock(&mutex);
+
 		if (slaveSocket >= 0) {
 			dispatchHTTP(slaveSocket);
 		}
@@ -195,19 +207,34 @@ void dispatchHTTP( int socket ) {
 	int length = 0;
 	char docPath[1025] = {0};
 
-
+	printf("1\n");
 	while(n = read(socket, &newChar, sizeof(newChar))){
 		//length++;
 		if(newChar == ' '){
 			
 			if(gotGET==0)
-				int gotGet = 1;
-			else 
+				gotGET = 1;
+			else {
 				curr_string[length]=0;
 				strcpy(docPath, curr_string);
+			}
 		}
 		
 		else if(newChar == '\n' && oldChar == '\r'){
+			read(socket, &oldChar, sizeof(oldChar));
+			read(socket, &newChar, sizeof(newChar));
+			if(oldChar == '\r' && newChar == '\n') break;
+		while(1){
+			while(read(socket, &oldChar, sizeof(oldChar))) {
+			if(oldChar == '\r') {
+			read(socket, &newChar, sizeof(newChar));
+			break;
+			}
+			}
+			read(socket, &oldChar, sizeof(oldChar));
+                        read(socket, &newChar, sizeof(newChar));
+                        if(oldChar == '\r' && newChar == '\n') break;		
+		}
 			break;
 		}
 	
@@ -220,6 +247,8 @@ void dispatchHTTP( int socket ) {
 		}
 	}
 
+
+	printf("2\n");
 	char cwd[256] = {0};
 	getcwd(cwd,sizeof(cwd)); 
 
@@ -241,6 +270,7 @@ void dispatchHTTP( int socket ) {
 	else {
 	
 		if(strcmp(docPath,"/") == 0) {
+			strcpy(docPath, "/index.html");
 			strcat(cwd, "/http-root-dir/htdocs/index.html");
 		}
 		
@@ -248,11 +278,9 @@ void dispatchHTTP( int socket ) {
 			strcat(cwd, "/http-root-dir/htdocs");
 			strcat(cwd, docPath);
 		}
-		
-	
 	}
 
-	if(strstr(docPath,"..") != 0) {
+	if(strstr(docPath,"..") != 0) {  //possible bug
 		char expand[1025] = {0};
 		char *real = realpath(docPath, expand);
 	
@@ -262,8 +290,10 @@ void dispatchHTTP( int socket ) {
 		}
 	
 	}
-	
-	char contentType[1025] = {0};
+	printf("3\n");
+
+
+	char contentType[256] = {0};
 	
 	
 	
@@ -271,50 +301,64 @@ void dispatchHTTP( int socket ) {
 	strcpy(contentType,"text/html");
 	}
 	
-	if(strstr(docPath, ".gif") != NULL || strstr(docPath,".gif/") != NULL) {
+	else if(strstr(docPath, ".gif") != NULL || strstr(docPath,".gif/") != NULL) {
 	strcpy(contentType, "image/gif");
 	}
-
+	
+	else if (strstr(docPath, ".jpg") != NULL || strstr(docPath,".jpg/") != NULL){
+        strcpy(contentType, "image/jpeg");
+    	}
+	else if (strstr(docPath, ".xbm") != NULL || strstr(docPath,".xbm/") != NULL){
+        strcpy(contentType, "image/xbm");  
+        }
+	
 	else {
 	strcpy(contentType, "text/plain");
 	}
 
-
+	printf("4\n");
 	FILE *doc;
-	printf("%s",cwd);	
-	if (strstr(contentType, "image/gif") != 0 || strstr(contentType, "image/jpeg") != 0)
+	//printf("%s",cwd);	
+	if (strstr(contentType, "image") != 0)// || strstr(contentType, "image/jpeg") != 0 ||strstr(contentType, "image/xbm") != 0  )
        		doc = fopen(cwd, "rb");
     	else
         	doc = fopen(cwd, "r");
 
-	
+
+	printf("5\n");
 	if(doc > 0) {
 	
 		write(socket, "HTTP/1.1 200 Document follows\r\n", 31);
-	
+		write(1, "HTTP/1.1 200 Document follows\r\n", 31);
 		write(socket, "Server: CS252 Lab4\r\n", 20);
-	
+		write(1, "Server: CS252 Lab4\r\n", 20);
 		write(socket, "Content-type: ",14);
-	
+		write(1, "Content-type: ",14);
 		write(socket,contentType, strlen(contentType));
-
+		write(1,contentType, strlen(contentType));
 		write(socket, "\r\n\r\n",4);	
-	
+		write(1, "\r\n\r\n",4);
 		long count = 0;
 		
 		char c;
 		int fd = fileno(doc);
-
-		while(count = read(fd,&c,sizeof(c))){
+		
+		while((count = (read(fd,&c,1)))){
 	
-			if(write(socket,&c,sizeof(c)) != count){
-			// 	perror("write");
+			//write(socket,&c,1);
+			//write(1,&c,1);
+			if((write(socket,&c,1)) != count){
+			 	perror("write");
 			}
 
 		}
-		
+		printf("Write\n");		
 		fclose(doc); 
+		printf("close\n");
+		close(fd);
 	}
+
+
 
 	else {
 	//404 error
@@ -333,5 +377,7 @@ void dispatchHTTP( int socket ) {
 		write(socket,notFound, strlen(notFound));
 	
 	}
-	
+	//return;
+	close(socket);
+//shutdown(socket,0);
 }
