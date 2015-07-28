@@ -318,7 +318,19 @@ char docPath[1025] = {0};
 
 	else {
 	//404 error
-	
+		const char *notFound = "File not Found";
+		
+                write(socket, "HTTP/1.1 404 File Not Found\r\n", 29);
+                        
+                write(socket, "Server: CS252 Lab4\r\n", 20);
+        
+                write(socket, "Content-type: ",14);
+                 
+                write(socket,contentType, strlen(contentType));
+        
+                write(socket, "\r\n\r\n",4);		
+		
+		write(socket,notFound, strlen(notFound));
 	
 	}
 	
