@@ -28,7 +28,7 @@ const char * usage =
 int QueueLength = 5;  
 
 // Processes time request
-void dispatchHTTP( int slaveSocket );
+void dispatchHTTP( int socket );
 void iterativeServer (int masterSocket);
 void forkServer (int masterSocket);
 void createThreadForEachRequest (int masterSocket);
@@ -91,6 +91,7 @@ else if (argv[1][1] == 't') createThreadForEachRequest(masterSocket);
 else if (argv[1][1] == 'p') poolOfThreads(masterSocket);
 
 else {
+
 }
 
 }
@@ -112,11 +113,11 @@ void iterativeServer( int masterSocket) {
 		 struct sockaddr_in clientIPAddress;
 		int alen = sizeof( clientIPAddress );
 		int slaveSocket =accept(masterSocket,(struct sockaddr*)&clientIPAddress, (socklen_t*)&alen);
-		
+	//		if(slaveSocket == -1) continue;		
 		if (slaveSocket >= 0) {
 			dispatchHTTP(slaveSocket);
 		}
-
+//	close(slaveSocket);
 	//dispatch http closes slave socket
 
 	}
@@ -184,7 +185,61 @@ void *loopthread (int masterSocket) {
 	}
 }
 
-void dispatchHTTP( int slaveSocket ) {
+void dispatchHTTP( int socket ) {
+
+char curr_string[1025];
+int n;
+unsigned char newChar;
+unsigned char oldChar = 0;
+int gotGET = 0;
+int length = 0;
+char docPath[1025] = {0};
+
+
+	while(n = read(socket, &newChar, sizeof(newChar))){
+		length++;
+		if(newChar == ' '){
+			
+			if(gotGET==0)
+				int gotGet = 1;
+			else 
+				curr_string[length]=0;
+				strcpy(docPath, curr_string);
+		}
+		
+		else if(newChar == '\n' && oldChar == '\r'){
+			break;
+		}
+	
+		else{
+			oldChar = newChar;
+			if(gotGET==0){
+				curr_string[length] = newChar;
+				length++;
+			}
+		}
+	}
+
+	char cwd[256] = {0};
+	getcwd(cwd,sizeof(cwd)); 
+
+	if (strncmp(docPath, "/icons", strlen("/icons")) == 0) {
+	
+	
+	}
+	
+	else if (strncmp(docPath, "/htdocs", strlen("/htdocs")) == 0) {
+	
+	}
+
+	else if (strncmp(docPath, "/cgi-bin", strlen("/cgi-bin")) == 0) {
+	
+	}
+	
+	else {
+	
+	
+	}
 
 
 }
