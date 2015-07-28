@@ -253,15 +253,30 @@ char docPath[1025] = {0};
 	}
 
 	if(strstr(docPath,"..") != 0) {
-	char expand[1025] = {0};
-	char *real = realpath(docPath, expand);
+		char expand[1025] = {0};
+		char *real = realpath(docPath, expand);
 	
-	if(real != NULL && strlen(expand) >= strlen(cwd) + strlen("/http-root-dir")) {
+		if(real != NULL && strlen(expand) >= strlen(cwd) + strlen("/http-root-dir")) {
+			strcpy(cwd,expand);	
 	
+		}
 	
 	}
 	
+	char contentType[1025] = {0};
+	
+	
+	
+	if(strstr(docPath, ".html") != NULL || strstr(docPath,".html/") != NULL) {
+	strcpy(contentType,"text/html");
+	}
+	
+	if(strstr(docPath, ".gif") != NULL || strstr(docPath,".gif/") != NULL) {
+	strcpy(contentType, "image/gif");
 	}
 
-
+	else {
+	strcpy(contentType, "text/plain");
+	}
+	
 }
