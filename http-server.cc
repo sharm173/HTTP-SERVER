@@ -370,7 +370,7 @@ execvp(arr[0], arr);
 
 	else {
 		char *a = strchr(cwd,'?');
-		a='\0';
+		*a='\0';
 		a++;
 		write(tmpout,a,strlen(a));
         	int set =setenv("QUERY_STRING", a, 1);
