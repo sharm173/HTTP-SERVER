@@ -375,10 +375,10 @@ execvp(arr[0], arr);
 		write(tmpout,a,strlen(a));
         	int set =setenv("QUERY_STRING", a, 1);
 		if(set != 0) perror("setenv");
-		char *arr[2];
+		char *arr[3];
 		arr[0] = cwd;
-		arr[1] = NULL;
-//		arr[2] = NULL;
+		arr[1] = a;
+		arr[2] = NULL;
 		execvp(arr[0], arr);
 
 
