@@ -361,7 +361,7 @@ arr[0] = cwd;
 arr[1] = NULL;
 
 execvp(arr[0], arr);
-//_exit(1);
+_exit(1);
 }
 
 dup2(tmpout,1);
