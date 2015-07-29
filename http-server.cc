@@ -347,7 +347,7 @@ if(strstr(cwd,"cgi-bin")!= NULL) {
                // write(1, "Content-type: ",14);
                // write(socket,contentType, strlen(contentType));
                // write(1,contentType, strlen(contentType));
-                write(socket, "\r\n",2);
+         //       write(socket, "\r\n",2);
                // write(1, "\r\n\r\n",4);
 //int tmpout = dup(1);
 //int tmpsoc = dup(socket);
