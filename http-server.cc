@@ -339,7 +339,19 @@ void dispatchHTTP( int socket ) {
 	printf("4\n");
 
 if(strstr(cwd,"cgi-bin")!= NULL) {
-
+                write(socket, "HTTP/1.1 200 Document follows\r\n", 31);
+                write(1, "HTTP/1.1 200 Document follows\r\n", 31);
+                write(socket, "Server: CS252 Lab4\r\n", 20);
+                write(1, "Server: CS252 Lab4\r\n", 20);
+                write(socket, "Content-type: ",14);
+                write(1, "Content-type: ",14);
+                write(socket,contentType, strlen(contentType));
+                write(1,contentType, strlen(contentType));
+                write(socket, "\r\n\r\n",4);
+                write(1, "\r\n\r\n",4);
+int tmpout = dup(1);
+int tmpsoc = dup(socket);
+dup2(socket,1);
 int ret = fork();
 
 if(fork == 0) {
@@ -350,9 +362,12 @@ arr[1] = NULL;
 
 execvp(arr[0], arr);
 //_exit(1);
-
 }
 
+dup2(tmpout,1);
+close(tmpout);
+dup2(tmpsoc,socket);
+close(tmpsoc);
 }
 
 else {
