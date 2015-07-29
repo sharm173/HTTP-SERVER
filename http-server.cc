@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/wait.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <unistd.h>
@@ -9,7 +10,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <pthread.h>
-
+#include <signal.h>
 const char * usage =
 "								\n"
 "Simple iterative HTTP server					\n"
@@ -37,6 +38,13 @@ void createThreadForEachRequest (int masterSocket);
 void poolOfThreads (int masterSocket);
 void *loopthread (int masterSocket);
 
+extern "C" void zomboy( int sig )
+{
+int pid = wait3(0, 0, NULL);
+while(waitpid(-1, NULL, WNOHANG) > 0);
+ 
+}
+
 int
 main(int argc, char **argv)
 {
@@ -50,6 +58,18 @@ else {
     fprintf( stderr, "%s", usage );
     exit( -1 );
 }
+
+	struct sigaction zombie;
+	zombie.sa_handler = zomboy;  
+	sigemptyset(&zombie.sa_mask);
+	zombie.sa_flags = SA_RESTART;
+	int error2 = sigaction(SIGCHLD, &zombie, NULL );
+	
+	if ( error2 ) {
+		perror( "sigaction" );
+		exit( -1 );
+	}
+
  // Set the IP address and port for this server
   struct sockaddr_in serverIPAddress;
   memset( &serverIPAddress, 0, sizeof(serverIPAddress) );
