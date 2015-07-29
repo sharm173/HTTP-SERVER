@@ -337,11 +337,30 @@ void dispatchHTTP( int socket ) {
 	}
 
 	printf("4\n");
+
+if(strstr(cwd,"cgi-bin")!= NULL) {
+
+int ret = fork();
+
+if(fork == 0) {
+//child process
+char *arr[2];
+arr[0] = cwd;
+arr[1] = NULL;
+
+execvp(arr[0], arr);
+_exit(1);
+
+}
+
+}
+
+else {
 	FILE *doc;
 	//printf("%s",cwd);	
 	if (strstr(contentType, "image") != 0)// || strstr(contentType, "image/jpeg") != 0 ||strstr(contentType, "image/xbm") != 0  )
        		doc = fopen(cwd, "rb");
-    	else
+	else
         	doc = fopen(cwd, "r");
 
 
@@ -397,6 +416,14 @@ void dispatchHTTP( int socket ) {
 		write(socket,notFound, strlen(notFound));
 	
 	}
+
+	}
+
+
+
+
+
+
 	//return;
 	close(socket);
 //shutdown(socket,0);
