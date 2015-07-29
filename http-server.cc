@@ -349,25 +349,32 @@ if(strstr(cwd,"cgi-bin")!= NULL) {
                 write(1,contentType, strlen(contentType));
                 write(socket, "\r\n\r\n",4);
                 write(1, "\r\n\r\n",4);
-int tmpout = dup(1);
-int tmpsoc = dup(socket);
-dup2(socket,1);
+//int tmpout = dup(1);
+//int tmpsoc = dup(socket);
+//dup2(socket,1);
 int ret = fork();
 
 if(ret == 0) {
+int tmpout = dup(1);
+int tmpsoc = dup(socket);
+dup2(socket,1);
 //child process
 char *arr[2];
 arr[0] = cwd;
 arr[1] = NULL;
 
 execvp(arr[0], arr);
-_exit(1);
-}
-
 dup2(tmpout,1);
 close(tmpout);
 dup2(tmpsoc,socket);
 close(tmpsoc);
+_exit(1);
+}
+
+//dup2(tmpout,1);
+//close(tmpout);
+//dup2(tmpsoc,socket);
+//close(tmpsoc);
 }
 
 else {
