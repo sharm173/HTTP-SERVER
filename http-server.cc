@@ -375,6 +375,8 @@ execvp(arr[0], arr);
 		write(tmpout,a,strlen(a));
         	int set =setenv("QUERY_STRING", a, 1);
 		if(set != 0) perror("setenv");
+		int set2 = setenv("REQUEST_METHOD","GET", 1);
+		if(set2 != 0) perror("setenv");
 		char *arr[3];
 		arr[0] = cwd;
 		arr[1] = a;
