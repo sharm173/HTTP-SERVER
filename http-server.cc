@@ -406,6 +406,8 @@ _exit(1);
 }
 
 else {
+if(is_dir(cwd)) strcat(cwd,"-html.html");
+
 	FILE *doc;
 	//printf("%s",cwd);	
 	if (strstr(contentType, "image") != 0)// || strstr(contentType, "image/jpeg") != 0 ||strstr(contentType, "image/xbm") != 0  )
