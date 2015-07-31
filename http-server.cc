@@ -414,7 +414,7 @@ char *arr[3];
 arr[0] = "cd";
 arr[1] = cwd;
 arr[2] = NULL;
-printf("exec\n");
+printf("exec%s\n",cwd);
 execvp(arr[0], arr);
 _exit(1);
 }
