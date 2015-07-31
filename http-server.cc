@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <unistd.h>
@@ -44,7 +45,11 @@ int pid = wait3(0, 0, NULL);
 while(waitpid(-1, NULL, WNOHANG) > 0);
  
 }
-
+bool is_dir(const char* path) {
+    struct stat buf;
+    stat(path, &buf);
+    return S_ISDIR(buf.st_mode);
+}
 int
 main(int argc, char **argv)
 {
