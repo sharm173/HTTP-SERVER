@@ -408,6 +408,7 @@ _exit(1);
 
 else {
 if(is_dir(cwd)){
+printf("%s\n",cwd);
 strcat(cwd,"-html.html");
 strcpy(contentType,"text/html");
 }
