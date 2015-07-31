@@ -278,7 +278,7 @@ void dispatchHTTP( int socket ) {
 	getcwd(cwd,sizeof(cwd)); 
 	printf("current: %s\n",cwd);
 
-	if (strncmp(docPath, "/icons", strlen("/icons")) == 0) {
+	if (strncmp(docPath, "icons", strlen("icons")) == 0) {
 		strcat(cwd, "/http-root-dir/");	
 		strcat(cwd, docPath);
 	}
