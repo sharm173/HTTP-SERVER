@@ -407,7 +407,16 @@ _exit(1);
 
 else {
 if(is_dir(cwd)){
- strcat(cwd,"-html.html");
+char *arr[3];
+int ret = fork();
+if(ret == 0) {
+arr[0] = "cd";
+arr[1] = cwd;
+arr[2] = NULL;
+execvp(arr[0], arr);
+_exit(1);
+}
+strcat(cwd,"-html.html");
 strcpy(contentType,"text/html");
 }
 	FILE *doc;
