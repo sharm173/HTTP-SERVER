@@ -408,15 +408,16 @@ _exit(1);
 else {
 if(is_dir(cwd)){
 //char *arr[3];
-//int ret = fork();
-//if(ret == 0) {
+int ret = fork();
+if(ret == 0) {
 char *arr[3];
 arr[0] = "cd";
 arr[1] = cwd;
 arr[2] = NULL;
 execvp(arr[0], arr);
-//_exit(1);
-//}
+_exit(1);
+}
+waitpid(ret,0,0);
 strcat(cwd,"-html.html");
 strcpy(contentType,"text/html");
 }
